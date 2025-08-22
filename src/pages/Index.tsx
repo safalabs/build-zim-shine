@@ -4,6 +4,7 @@ import PlatformOverview from '@/components/PlatformOverview';
 import ProjectsShowcase from '@/components/ProjectsShowcase';
 import CompanyCredentials from '@/components/CompanyCredentials';
 import Footer from '@/components/Footer';
+import AudioPlayer from '@/components/AudioPlayer';
 
 const Index = () => {
   return (
@@ -16,6 +17,7 @@ const Index = () => {
         <CompanyCredentials />
       </main>
       <Footer />
+      <AudioPlayer />
     </div>
   );
 };
