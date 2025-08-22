@@ -26,9 +26,9 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <img 
-              src="/lovable-uploads/b440c6a5-131b-4704-b39b-769befa15d89.png" 
+              src="/lovable-uploads/33827882-4e4b-4ea3-80f5-fd87c43d40cf.png" 
               alt="Visionary Property Development Logo"
-              className="w-10 h-10 object-contain"
+              className="w-12 h-12 object-contain hover:scale-105 transition-transform duration-200"
             />
             <div className="space-y-1">
               <div className={`text-lg font-bold transition-colors ${
