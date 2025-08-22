@@ -25,9 +25,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <div className="w-6 h-6 text-white font-bold">V</div>
-            </div>
+            <img 
+              src="/lovable-uploads/b440c6a5-131b-4704-b39b-769befa15d89.png" 
+              alt="Visionary Property Development Logo"
+              className="w-10 h-10 object-contain"
+            />
             <div className="space-y-1">
               <div className={`text-lg font-bold transition-colors ${
                 isScrolled ? 'text-foreground' : 'text-white'
