@@ -6,7 +6,7 @@ import CompanyCredentials from '@/components/CompanyCredentials';
 import Footer from '@/components/Footer';
 import AudioPlayer from '@/components/AudioPlayer';
 
-const Index = () => {
+export default function Home() {
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -20,6 +20,4 @@ const Index = () => {
       <AudioPlayer />
     </div>
   );
-};
-
-export default Index;
+}
