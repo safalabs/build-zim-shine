@@ -1,10 +1,14 @@
+
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import SignInModal from './SignInModal';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,6 +93,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             <Button 
               variant="ghost" 
+              onClick={() => setIsSignInModalOpen(true)}
               className={`transition-colors ${
                 isScrolled 
                   ? 'text-foreground hover:text-primary' 
@@ -130,7 +135,14 @@ export default function Navbar() {
                 Contact
               </a>
               <div className="pt-4 border-t border-gray-200 space-y-3">
-                <Button variant="ghost" className="w-full justify-start text-foreground">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {
+                    setIsSignInModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full justify-start text-foreground"
+                >
                   Sign In
                 </Button>
                 <Button className="w-full bg-primary hover:bg-primary-dark text-white">
@@ -141,6 +153,11 @@ export default function Navbar() {
           </div>
         )}
       </div>
+      
+      <SignInModal 
+        isOpen={isSignInModalOpen} 
+        onClose={() => setIsSignInModalOpen(false)} 
+      />
     </nav>
   );
 }
