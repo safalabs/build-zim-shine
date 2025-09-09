@@ -1,14 +1,14 @@
-
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import SignInModal from './SignInModal';
+import RegisterModal from './RegisterModal';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -102,7 +102,7 @@ export default function Navbar() {
             >
               Sign In
             </Button>
-            <Button className="bg-primary hover:bg-primary-dark text-white">
+            <Button onClick={() => setIsRegisterModalOpen(true)} className="bg-primary hover:bg-primary-dark text-white">
               Get Started
             </Button>
           </div>
@@ -145,7 +145,13 @@ export default function Navbar() {
                 >
                   Sign In
                 </Button>
-                <Button className="w-full bg-primary hover:bg-primary-dark text-white">
+                <Button 
+                  onClick={() => {
+                    setIsRegisterModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-primary hover:bg-primary-dark text-white"
+                >
                   Get Started
                 </Button>
               </div>
@@ -156,7 +162,19 @@ export default function Navbar() {
       
       <SignInModal 
         isOpen={isSignInModalOpen} 
-        onClose={() => setIsSignInModalOpen(false)} 
+        onClose={() => setIsSignInModalOpen(false)}
+        onSwitchToRegister={() => {
+          setIsSignInModalOpen(false);
+          setIsRegisterModalOpen(true);
+        }}
+      />
+      <RegisterModal 
+        isOpen={isRegisterModalOpen} 
+        onClose={() => setIsRegisterModalOpen(false)}
+        onSwitchToSignIn={() => {
+          setIsRegisterModalOpen(false);
+          setIsSignInModalOpen(true);
+        }}
       />
     </nav>
   );

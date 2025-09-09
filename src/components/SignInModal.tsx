@@ -15,9 +15,10 @@ import { useToast } from '@/hooks/use-toast';
 interface SignInModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSwitchToRegister: () => void;
 }
 
-export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
+export default function SignInModal({ isOpen, onClose, onSwitchToRegister }: SignInModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -129,6 +130,7 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
             Don't have an account?{' '}
             <button
               type="button"
+              onClick={onSwitchToRegister}
               className="text-primary hover:text-primary/80 transition-colors font-medium"
             >
               Sign up
