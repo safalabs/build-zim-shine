@@ -16,9 +16,13 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ProfileSidebar from '@/components/ProfileSidebar';
+import KYCProgress from '@/components/KYCProgress';
+import DocumentUpload from '@/components/DocumentUpload';
 
 const InvestorDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
+  const [activeProfileTab, setActiveProfileTab] = useState('profile');
 
   const investments = [
     {
@@ -67,84 +71,82 @@ const InvestorDashboard = () => {
 
   if (showProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex items-center justify-between mb-8">
-            <Button 
-              variant="ghost" 
-              onClick={() => setShowProfile(false)}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Dashboard
-            </Button>
-            <div className="flex items-center gap-4">
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <div className="bg-background border-b border-border">
+          <div className="container mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <Button 
+                variant="ghost" 
+                onClick={() => setShowProfile(false)}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Dashboard
+              </Button>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                Visionary
+              </h1>
               <Button variant="outline" className="flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
                 Sign Out
               </Button>
             </div>
           </div>
+        </div>
 
-          <div className="max-w-2xl mx-auto">
-            <Card className="shadow-lg">
-              <CardHeader className="text-center">
-                <div className="w-24 h-24 bg-gradient-to-r from-primary to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <User className="w-12 h-12 text-white" />
+        <div className="flex">
+          <ProfileSidebar activeTab={activeProfileTab} onTabChange={setActiveProfileTab} />
+          
+          <div className="flex-1 p-8">
+            {activeProfileTab === 'profile' && (
+              <div>
+                <div className="flex items-center justify-between mb-8">
+                  <h1 className="text-3xl font-bold">Profile</h1>
+                  <Button className="bg-primary hover:bg-primary/90">
+                    Edit Profile
+                  </Button>
                 </div>
-                <CardTitle className="text-2xl">Investor Profile</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Full Name</label>
-                    <p className="text-lg font-semibold">John Alexander Smith</p>
+
+                <div className="flex items-start gap-8 mb-8">
+                  <div className="w-32 h-32 bg-gradient-to-r from-primary to-blue-600 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img 
+                      src="/lovable-uploads/bf08ddbc-7373-4c24-a7fb-b1311c6dc9e1.png"
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Email</label>
-                    <p className="text-lg">john.smith@email.com</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Investor ID</label>
-                    <p className="text-lg font-mono">INV-2024-001</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Member Since</label>
-                    <p className="text-lg">January 2024</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Risk Profile</label>
-                    <Badge variant="secondary">Moderate Risk</Badge>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Investment Tier</label>
-                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">Gold Investor</Badge>
+                  
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-2">Kudzai M.</h2>
+                    <p className="text-muted-foreground mb-2">kudzai.m@gmail.com</p>
+                    <p className="text-muted-foreground mb-2">+263 772 123 456</p>
+                    <p className="text-muted-foreground">78 Kaguvi St, Harare, Zimbabwe</p>
                   </div>
                 </div>
-                
-                <div className="pt-4 border-t">
-                  <h3 className="text-lg font-semibold mb-4">Investment Summary</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-primary">{investments.length}</p>
-                      <p className="text-sm text-muted-foreground">Active Investments</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">${totalCurrentValue.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground">Portfolio Value</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-blue-600">{totalROI.toFixed(1)}%</p>
-                      <p className="text-sm text-muted-foreground">Total ROI</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-purple-600">${totalPayouts.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground">Total Payouts</p>
-                    </div>
+              </div>
+            )}
+
+            {activeProfileTab === 'security' && (
+              <div>
+                <h1 className="text-3xl font-bold mb-8">Security</h1>
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Password & Authentication</h3>
+                  <p className="text-muted-foreground mb-6">Manage your password and two-factor authentication settings.</p>
+                  <div className="space-y-4">
+                    <Button variant="outline">Change Password</Button>
+                    <Button variant="outline">Enable Two-Factor Auth</Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </Card>
+              </div>
+            )}
+
+            {activeProfileTab === 'kyc' && (
+              <div>
+                <KYCProgress currentStep={1} />
+                <DocumentUpload />
+              </div>
+            )}
           </div>
         </div>
       </div>
