@@ -102,17 +102,6 @@ export default function Navbar() {
             >
               Sign In
             </Button>
-            <Button 
-              variant="ghost"
-              asChild
-              className={`transition-colors ${
-                isScrolled 
-                  ? 'text-foreground hover:text-primary' 
-                  : 'text-white hover:text-primary hover:bg-white/10'
-              }`}
-            >
-              <a href="/investor-dashboard">Dashboard</a>
-            </Button>
             <Button onClick={() => setIsRegisterModalOpen(true)} className="bg-primary hover:bg-primary-dark text-white">
               Get Started
             </Button>
