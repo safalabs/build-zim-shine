@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Play, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight, Play, TrendingUp, Users, DollarSign, X } from 'lucide-react';
 import heroProject1 from '@/assets/hero-project-1.jpg';
 import heroProject2 from '@/assets/hero-project-2.jpg';
 import heroProject3 from '@/assets/hero-project-3.jpg';
@@ -41,6 +42,12 @@ const heroSlides = [
 export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [showDemoModal, setShowDemoModal] = useState(false);
+
+  const handleStartInvesting = () => {
+    // Scroll to the projects section to show investment opportunities
+    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     if (!isAutoPlaying) return;
@@ -107,13 +114,18 @@ export default function HeroSection() {
               </div>
 
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" className="bg-primary hover:bg-primary-dark text-white px-8 py-4 text-lg">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary-dark text-white px-8 py-4 text-lg"
+                  onClick={handleStartInvesting}
+                >
                   Start Investing
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
                   className="border-white text-white hover:bg-white hover:text-black px-8 py-4 text-lg"
+                  onClick={() => setShowDemoModal(true)}
                 >
                   <Play className="w-5 h-5 mr-2" />
                   Watch Demo
@@ -237,6 +249,55 @@ export default function HeroSection() {
           <Play className={`w-4 h-4 text-white ${isAutoPlaying ? 'opacity-50' : 'opacity-100'}`} />
         </button>
       </div>
+
+      {/* Demo Modal */}
+      <Dialog open={showDemoModal} onOpenChange={setShowDemoModal}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">
+              Platform Demo - Visionary Property Development
+            </DialogTitle>
+          </DialogHeader>
+          <div className="aspect-video bg-slate-100 rounded-lg overflow-hidden">
+            {/* YouTube Video Embed */}
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/3JZ_D3ELwOQ?autoplay=1&rel=0&modestbranding=1" 
+              title="Property Investment Platform Demo"
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          </div>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground mb-4">
+              Duration: 3:45 | Learn about investment opportunities, platform features, and success stories
+            </p>
+            <div className="flex justify-center gap-4">
+              <Button 
+                variant="outline"
+                onClick={() => setShowDemoModal(false)}
+              >
+                Close Demo
+              </Button>
+              <Button 
+                className="bg-primary hover:bg-primary/90"
+                onClick={() => {
+                  setShowDemoModal(false);
+                  // Navigate to projects section
+                  setTimeout(() => {
+                    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 300);
+                }}
+              >
+                Start Investing
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

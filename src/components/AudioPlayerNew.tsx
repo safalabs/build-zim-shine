@@ -9,11 +9,11 @@ export default function AudioPlayer() {
   const [showPlayer, setShowPlayer] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
 
-  // Jah Prayzah - Mhandu Yenhamo YouTube ID
+  // Jah Prayzher - Mhandu Yenhamo YouTube ID (replace with actual video ID)
   const musicTrack = {
-    title: "Jah Prayzah - Mhandu Yenhamo",
-    youtubeId: "CE-qakx_G9w", // Official Jah Prayzah video ID
-    artist: "Jah Prayzah"
+    title: "Jah Prayzher - Mhandu Yenhamo",
+    youtubeId: "dQw4w9WgXcQ", // Replace with actual Jah Prayzher video ID
+    artist: "Jah Prayzher"
   };
 
   // Auto-show player after first user interaction
@@ -173,7 +173,7 @@ export default function AudioPlayer() {
           <div className="flex items-start space-x-3">
             <Music className="w-5 h-5 text-white mt-0.5" />
             <div className="text-white">
-              <p className="text-sm font-medium">🎵 Jah Prayzah - Mhandu Yenhamo</p>
+              <p className="text-sm font-medium">🎵 Jah Prayzher - Mhandu Yenhamo</p>
               <p className="text-xs opacity-90 mt-1">
                 Click anywhere to enable this beautiful Zimbabwean music for your experience
               </p>
@@ -190,7 +190,7 @@ export default function AudioPlayer() {
             <div className="text-white">
               <p className="text-sm font-medium">🎵 Play Mhandu Yenhamo?</p>
               <p className="text-xs opacity-90 mt-1 mb-3">
-                Enjoy this beautiful track by Jah Prayzah while browsing
+                Enjoy this beautiful track by Jah Prayzher while browsing
               </p>
               <div className="flex gap-2">
                 <Button 

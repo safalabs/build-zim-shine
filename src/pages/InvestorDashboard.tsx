@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
@@ -28,7 +34,9 @@ import {
   Clock,
   Target,
   Play,
-  Download
+  Download,
+  Lock,
+  Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProfileSidebar from '@/components/ProfileSidebar';
@@ -38,11 +46,63 @@ import DocumentUpload from '@/components/DocumentUpload';
 const InvestorDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [activeProfileTab, setActiveProfileTab] = useState('profile');
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [showGoalDialog, setShowGoalDialog] = useState(false);
+  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [newGoal, setNewGoal] = useState({ title: '', description: '', targetDate: '' });
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user, updateKycStatus, logout } = useAuth();
+  const [profileData, setProfileData] = useState({
+    name: 'Kudzai M.',
+    email: 'kudzai.m@gmail.com',
+    phone: '+263 772 123 456',
+    address: '78 Kaguvi St, Harare, Zimbabwe',
+    bio: 'Experienced investor focused on property development and sustainable growth.'
+  });
 
   const handleSignOut = () => {
     // You can add any cleanup logic here (like clearing auth tokens)
     navigate('/');
+  };
+
+  const handleProfileUpdate = () => {
+    setIsEditingProfile(false);
+    // Here you would typically save to backend
+    console.log('Profile updated:', profileData);
+  };
+
+  const handleFileUpload = (files: FileList | null) => {
+    if (files) {
+      const fileArray = Array.from(files);
+      setUploadedFiles(fileArray);
+      console.log('Files selected:', fileArray);
+    }
+  };
+
+  const handleUploadCancel = () => {
+    setUploadedFiles([]);
+    setShowUploadDialog(false);
+  };
+
+  const handleUploadComplete = () => {
+    // Handle the actual upload logic here
+    console.log('Uploading files:', uploadedFiles);
+    // You can add API call here
+    setUploadedFiles([]);
+    setShowUploadDialog(false);
+  };
+
+  const handleSetNewGoal = () => {
+    // Handle setting new goal logic here
+    console.log('New goal set:', newGoal);
+    // You can add API call here to save the goal
+    
+    // Reset the form
+    setNewGoal({ title: '', description: '', targetDate: '' });
+    setShowGoalDialog(false);
   };
 
   const investments = [
@@ -141,7 +201,7 @@ const InvestorDashboard = () => {
                     </div>
                     
                     <div className="flex-1">
-                      <h1 className="text-3xl font-bold mb-2">Kudzai M.</h1>
+                      <h1 className="text-3xl font-bold mb-2">{profileData.name}</h1>
                       <p className="text-white/80 mb-4">Premium Investor • Member since 2024</p>
                       <div className="flex items-center gap-6 text-sm">
                         <div className="flex items-center gap-2">
@@ -159,10 +219,74 @@ const InvestorDashboard = () => {
                       </div>
                     </div>
                     
-                    <Button className="bg-white/20 hover:bg-white/30 border-white/30">
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
+                    <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
+                      <DialogTrigger asChild>
+                        <Button className="bg-white/20 hover:bg-white/30 border-white/30">
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Profile
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Edit Profile</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="name">Full Name</Label>
+                            <Input
+                              id="name"
+                              value={profileData.name}
+                              onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              value={profileData.email}
+                              onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="phone">Phone</Label>
+                            <Input
+                              id="phone"
+                              value={profileData.phone}
+                              onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="address">Address</Label>
+                            <Input
+                              id="address"
+                              value={profileData.address}
+                              onChange={(e) => setProfileData({...profileData, address: e.target.value})}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="bio">Bio</Label>
+                            <Textarea
+                              id="bio"
+                              value={profileData.bio}
+                              onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                              rows={3}
+                            />
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={() => setShowEditProfileDialog(false)}>
+                              Cancel
+                            </Button>
+                            <Button onClick={() => {
+                              handleProfileUpdate();
+                              setShowEditProfileDialog(false);
+                            }}>
+                              Save Changes
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
 
@@ -214,14 +338,14 @@ const InvestorDashboard = () => {
                         <Mail className="w-5 h-5 text-muted-foreground" />
                         <div>
                           <p className="text-sm text-muted-foreground">Email</p>
-                          <p className="font-medium">kudzai.m@gmail.com</p>
+                          <p className="font-medium">{profileData.email}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <Phone className="w-5 h-5 text-muted-foreground" />
                         <div>
                           <p className="text-sm text-muted-foreground">Phone</p>
-                          <p className="font-medium">+263 772 123 456</p>
+                          <p className="font-medium">{profileData.phone}</p>
                         </div>
                       </div>
                     </div>
@@ -230,7 +354,7 @@ const InvestorDashboard = () => {
                         <MapPin className="w-5 h-5 text-muted-foreground" />
                         <div>
                           <p className="text-sm text-muted-foreground">Address</p>
-                          <p className="font-medium">78 Kaguvi St, Harare, Zimbabwe</p>
+                          <p className="font-medium">{profileData.address}</p>
                         </div>
                       </div>
                     </div>
@@ -243,7 +367,13 @@ const InvestorDashboard = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl font-bold">My Projects</h1>
-                  <Button className="bg-primary hover:bg-primary/90">
+                  <Button 
+                    className="bg-primary hover:bg-primary/90"
+                    onClick={() => {
+                      // Navigate back to main dashboard to see all investments
+                      setShowProfile(false);
+                    }}
+                  >
                     <Building2 className="w-4 h-4 mr-2" />
                     View All Investments
                   </Button>
@@ -343,10 +473,60 @@ const InvestorDashboard = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl font-bold">Investment Milestones</h1>
-                  <Button variant="outline">
-                    <Target className="w-4 h-4 mr-2" />
-                    Set New Goal
-                  </Button>
+                  <Dialog open={showGoalDialog} onOpenChange={setShowGoalDialog}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">
+                        <Target className="w-4 h-4 mr-2" />
+                        Set New Goal
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Set New Investment Goal</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="goal-title">Goal Title</Label>
+                          <Input
+                            id="goal-title"
+                            placeholder="e.g., Reach $500K Portfolio"
+                            value={newGoal.title}
+                            onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="goal-description">Description</Label>
+                          <Textarea
+                            id="goal-description"
+                            placeholder="Describe your investment goal..."
+                            value={newGoal.description}
+                            onChange={(e) => setNewGoal({...newGoal, description: e.target.value})}
+                            rows={3}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="target-date">Target Date</Label>
+                          <Input
+                            id="target-date"
+                            type="date"
+                            value={newGoal.targetDate}
+                            onChange={(e) => setNewGoal({...newGoal, targetDate: e.target.value})}
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setShowGoalDialog(false)}>
+                            Cancel
+                          </Button>
+                          <Button 
+                            onClick={handleSetNewGoal}
+                            disabled={!newGoal.title || !newGoal.description || !newGoal.targetDate}
+                          >
+                            Set Goal
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 {/* Achievement Cards */}
@@ -434,10 +614,66 @@ const InvestorDashboard = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h1 className="text-3xl font-bold">Media Gallery</h1>
-                  <Button className="bg-primary hover:bg-primary/90">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload Media
-                  </Button>
+                  <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-primary hover:bg-primary/90">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Media
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Upload Media</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                          <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                          <p className="text-lg font-medium mb-2">Drag and drop files here</p>
+                          <p className="text-sm text-muted-foreground mb-4">or click to browse</p>
+                          <Button variant="outline">
+                            <input
+                              type="file"
+                              multiple
+                              accept="image/*,video/*,.pdf,.doc,.docx"
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              onChange={(e) => handleFileUpload(e.target.files)}
+                            />
+                            Choose Files
+                          </Button>
+                          {uploadedFiles.length > 0 && (
+                            <div className="mt-4 text-left">
+                              <p className="text-sm font-medium mb-2">Selected files:</p>
+                              <ul className="text-sm text-muted-foreground">
+                                {uploadedFiles.map((file, index) => (
+                                  <li key={index}>{file.name}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleUploadCancel();
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleUploadComplete();
+                            }} 
+                            disabled={uploadedFiles.length === 0}
+                          >
+                            Upload
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 {/* Media Categories */}
@@ -540,21 +776,213 @@ const InvestorDashboard = () => {
             {activeProfileTab === 'security' && (
               <div>
                 <h1 className="text-3xl font-bold mb-8">Security</h1>
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Password & Authentication</h3>
-                  <p className="text-muted-foreground mb-6">Manage your password and two-factor authentication settings.</p>
-                  <div className="space-y-4">
-                    <Button variant="outline">Change Password</Button>
-                    <Button variant="outline">Enable Two-Factor Auth</Button>
-                  </div>
-                </Card>
+                <div className="space-y-6">
+                  <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Password & Authentication</h3>
+                    <p className="text-muted-foreground mb-6">Manage your password and two-factor authentication settings.</p>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => {
+                          toast({
+                            title: "Change Password",
+                            description: "Password change form would open here",
+                          });
+                        }}
+                      >
+                        <Lock className="w-4 h-4 mr-2" />
+                        Change Password
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => {
+                          toast({
+                            title: "Two-Factor Authentication",
+                            description: "2FA setup would open here",
+                          });
+                        }}
+                      >
+                        <Shield className="w-4 h-4 mr-2" />
+                        Enable Two-Factor Auth
+                      </Button>
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Account Security</h3>
+                    <p className="text-muted-foreground mb-6">Monitor and manage your account security settings.</p>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Login Notifications</p>
+                          <p className="text-sm text-muted-foreground">Get notified when someone logs into your account</p>
+                        </div>
+                        <Button variant="outline" size="sm">Enable</Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Session Management</p>
+                          <p className="text-sm text-muted-foreground">View and manage your active sessions</p>
+                        </div>
+                        <Button variant="outline" size="sm">Manage</Button>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
               </div>
             )}
 
             {activeProfileTab === 'kyc' && (
               <div>
-                <KYCProgress currentStep={1} />
+                <div className="mb-6">
+                  <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold">KYC Verification</h1>
+                    <Badge 
+                      className={
+                        user?.kycStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                        user?.kycStatus === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
+                        user?.kycStatus === 'rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }
+                    >
+                      {user?.kycStatus === 'approved' ? 'Approved' :
+                       user?.kycStatus === 'under_review' ? 'Under Review' :
+                       user?.kycStatus === 'rejected' ? 'Rejected' :
+                       'Pending'}
+                    </Badge>
+                  </div>
+                  
+                  {/* Demo Controls */}
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 className="font-medium text-blue-800 mb-2">Demo Controls</h4>
+                    <p className="text-sm text-blue-700 mb-3">
+                      For demonstration purposes, you can simulate different KYC statuses:
+                    </p>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          updateKycStatus('under_review');
+                          toast({
+                            title: "KYC Status Updated",
+                            description: "Status changed to: Under Review",
+                          });
+                        }}
+                      >
+                        Set Under Review
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => {
+                          updateKycStatus('approved');
+                          toast({
+                            title: "KYC Status Updated",
+                            description: "Status changed to: Approved ✓ You can now invest!",
+                          });
+                        }}
+                      >
+                        Approve KYC (Demo)
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          updateKycStatus('rejected');
+                          toast({
+                            title: "KYC Status Updated",
+                            description: "Status changed to: Rejected",
+                            variant: "destructive"
+                          });
+                        }}
+                      >
+                        Set Rejected
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <KYCProgress 
+                  currentStep={
+                    user?.kycStatus === 'approved' ? 3 :
+                    user?.kycStatus === 'under_review' ? 2 :
+                    1
+                  } 
+                />
                 <DocumentUpload />
+              </div>
+            )}
+
+            {activeProfileTab === 'settings' && (
+              <div>
+                <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
+                <div className="space-y-6">
+                  {/* Notification Settings */}
+                  <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Notification Preferences</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Email Notifications</p>
+                          <p className="text-sm text-muted-foreground">Receive updates about your investments</p>
+                        </div>
+                        <Button variant="outline" size="sm">Configure</Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">SMS Notifications</p>
+                          <p className="text-sm text-muted-foreground">Get SMS alerts for important updates</p>
+                        </div>
+                        <Button variant="outline" size="sm">Configure</Button>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Privacy Settings */}
+                  <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Privacy & Data</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Data Export</p>
+                          <p className="text-sm text-muted-foreground">Download your personal data</p>
+                        </div>
+                        <Button variant="outline" size="sm">Export Data</Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Account Deletion</p>
+                          <p className="text-sm text-muted-foreground">Permanently delete your account</p>
+                        </div>
+                        <Button variant="outline" size="sm">Delete Account</Button>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Language & Region */}
+                  <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-4">Language & Region</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Language</p>
+                          <p className="text-sm text-muted-foreground">Current: English</p>
+                        </div>
+                        <Button variant="outline" size="sm">Change</Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Currency</p>
+                          <p className="text-sm text-muted-foreground">Current: USD</p>
+                        </div>
+                        <Button variant="outline" size="sm">Change</Button>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
               </div>
             )}
           </div>

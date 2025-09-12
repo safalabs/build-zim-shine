@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SignInModalProps {
   isOpen: boolean;
@@ -26,24 +27,41 @@ export default function SignInModal({ isOpen, onClose, onSwitchToRegister }: Sig
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate authentication
-    setTimeout(() => {
+    try {
+      const success = await login(email, password);
+      setIsLoading(false);
+      
+      if (success) {
+        toast({
+          title: "Sign In Successful",
+          description: "Welcome back! Redirecting to dashboard...",
+        });
+        onClose();
+        setEmail('');
+        setPassword('');
+        // Navigate to dashboard after successful login
+        navigate('/investor-dashboard');
+      } else {
+        toast({
+          title: "Sign In Failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
       setIsLoading(false);
       toast({
-        title: "Sign In Successful",
-        description: "Welcome back! Redirecting to dashboard...",
+        title: "Sign In Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive"
       });
-      onClose();
-      setEmail('');
-      setPassword('');
-      // Navigate to dashboard after successful login
-      navigate('/investor-dashboard');
-    }, 1500);
+    }
   };
 
   const handleClose = () => {

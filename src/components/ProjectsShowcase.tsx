@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import InvestmentModal from '@/components/InvestmentModal';
+import SignInModal from '@/components/SignInModal';
+import RegisterModal from '@/components/RegisterModal';
 import { 
   MapPin, 
   Calendar, 
@@ -10,7 +14,8 @@ import {
   DollarSign,
   ArrowRight,
   Filter,
-  Star
+  Star,
+  X
 } from 'lucide-react';
 
 const projects = [
@@ -107,6 +112,11 @@ const typeColors = {
 export default function ProjectsShowcase() {
   const [filter, setFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false);
+  const [selectedInvestmentProject, setSelectedInvestmentProject] = useState(null);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const filters = ['All', 'Active', 'Completed', 'Upcoming'];
 
@@ -136,6 +146,7 @@ export default function ProjectsShowcase() {
               {filters.map((filterOption) => (
                 <button
                   key={filterOption}
+                  data-filter={filterOption}
                   onClick={() => setFilter(filterOption)}
                   className={`px-6 py-2 rounded-md transition-all ${
                     filter === filterOption
@@ -261,11 +272,22 @@ export default function ProjectsShowcase() {
                   <Button 
                     className="flex-1 bg-primary hover:bg-primary-dark text-white"
                     disabled={project.status === 'Completed'}
+                    onClick={() => {
+                      setSelectedInvestmentProject(project);
+                      setIsInvestmentModalOpen(true);
+                    }}
                   >
                     {project.status === 'Upcoming' ? 'Pre-Register' : 
                      project.status === 'Completed' ? 'View Returns' : 'Invest Now'}
                   </Button>
-                  <Button variant="outline" className="px-4">
+                  <Button 
+                    variant="outline" 
+                    className="px-4"
+                    onClick={() => {
+                      setSelectedProject(project);
+                      setIsProjectModalOpen(true);
+                    }}
+                  >
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
@@ -282,7 +304,15 @@ export default function ProjectsShowcase() {
             Start with as little as $100 and watch your investment grow.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-primary hover:bg-primary-dark text-white px-8">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary-dark text-white px-8"
+              onClick={() => {
+                setFilter('All');
+                // Scroll to top of projects section
+                document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               Browse All Projects
             </Button>
             <Button size="lg" variant="outline">
@@ -291,6 +321,176 @@ export default function ProjectsShowcase() {
           </div>
         </div>
       </div>
+
+      {/* Project Details Modal */}
+      <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedProject && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold">{selectedProject.title}</DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-6">
+                {/* Project Image */}
+                <div className="relative h-64 rounded-lg overflow-hidden">
+                  <img
+                    src={selectedProject.image}
+                    alt={selectedProject.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    <Badge className={statusColors[selectedProject.status]}>
+                      {selectedProject.status}
+                    </Badge>
+                    <Badge className={typeColors[selectedProject.type]}>
+                      {selectedProject.type}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Project Details Grid */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Project Overview</h3>
+                    <p className="text-muted-foreground mb-4">{selectedProject.description}</p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        <span>{selectedProject.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <span>{selectedProject.completionDate}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span>{selectedProject.rating > 0 ? `${selectedProject.rating}/5 Rating` : 'New Project'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Investment Details</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Target Amount:</span>
+                        <span className="font-semibold">{selectedProject.targetAmount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Current Amount:</span>
+                        <span className="font-semibold">{selectedProject.currentAmount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Expected Returns:</span>
+                        <span className="font-semibold text-success">{selectedProject.expectedReturns}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Minimum Investment:</span>
+                        <span className="font-semibold">{selectedProject.minInvestment}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Total Investors:</span>
+                        <span className="font-semibold">{selectedProject.investors}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Timeline:</span>
+                        <span className="font-semibold">{selectedProject.timeframe}</span>
+                      </div>
+                    </div>
+
+                    {/* Funding Progress */}
+                    {selectedProject.status !== 'Upcoming' && (
+                      <div className="mt-6 space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Funding Progress</span>
+                          <span className="font-medium">{selectedProject.fundedPercentage}%</span>
+                        </div>
+                        <div className="w-full bg-secondary rounded-full h-3">
+                          <div 
+                            className="bg-gradient-primary h-3 rounded-full transition-all duration-500"
+                            style={{ width: `${selectedProject.fundedPercentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Project Highlights */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Key Highlights</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProject.highlights.map((highlight, index) => (
+                      <span 
+                        key={index}
+                        className="bg-primary/10 text-primary text-sm px-3 py-1 rounded-full"
+                      >
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-4 pt-4 border-t">
+                  <Button 
+                    size="lg"
+                    className="flex-1 bg-primary hover:bg-primary-dark text-white"
+                    disabled={selectedProject.status === 'Completed'}
+                    onClick={() => {
+                      setSelectedInvestmentProject(selectedProject);
+                      setIsInvestmentModalOpen(true);
+                      setIsProjectModalOpen(false);
+                    }}
+                  >
+                    {selectedProject.status === 'Upcoming' ? 'Pre-Register Interest' : 
+                     selectedProject.status === 'Completed' ? 'View Returns Report' : 'Invest Now'}
+                  </Button>
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                  >
+                    Download Prospectus
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Investment Modal */}
+      <InvestmentModal
+        isOpen={isInvestmentModalOpen}
+        onClose={() => setIsInvestmentModalOpen(false)}
+        project={selectedInvestmentProject}
+        onSwitchToSignIn={() => {
+          setIsInvestmentModalOpen(false);
+          setIsSignInModalOpen(true);
+        }}
+      />
+
+      {/* Sign In Modal */}
+      <SignInModal 
+        isOpen={isSignInModalOpen} 
+        onClose={() => setIsSignInModalOpen(false)}
+        onSwitchToRegister={() => {
+          setIsSignInModalOpen(false);
+          setIsRegisterModalOpen(true);
+        }}
+      />
+      
+      {/* Register Modal */}
+      <RegisterModal 
+        isOpen={isRegisterModalOpen} 
+        onClose={() => setIsRegisterModalOpen(false)}
+        onSwitchToSignIn={() => {
+          setIsRegisterModalOpen(false);
+          setIsSignInModalOpen(true);
+        }}
+      />
     </section>
   );
 }

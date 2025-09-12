@@ -7,6 +7,7 @@ import RegisterModal from './RegisterModal';
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileProjectsOpen, setIsMobileProjectsOpen] = useState(false);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
@@ -55,6 +56,10 @@ export default function Navbar() {
               className={`transition-colors hover:text-primary ${
                 isScrolled ? 'text-foreground' : 'text-white'
               }`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               Platform
             </a>
@@ -65,10 +70,55 @@ export default function Navbar() {
                 <span>Projects</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                <a href="#active" className="block px-4 py-3 text-sm hover:bg-gray-50 text-foreground">Active Projects</a>
-                <a href="#completed" className="block px-4 py-3 text-sm hover:bg-gray-50 text-foreground">Completed Projects</a>
-                <a href="#upcoming" className="block px-4 py-3 text-sm hover:bg-gray-50 text-foreground">Upcoming Projects</a>
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <a 
+                  href="#projects" 
+                  className="block px-4 py-3 text-sm hover:bg-gray-50 text-foreground border-b border-gray-100"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Scroll to projects section and trigger Active filter
+                    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                    // Trigger filter change after scroll
+                    setTimeout(() => {
+                      const filterButton = document.querySelector('[data-filter="Active"]') as HTMLButtonElement;
+                      filterButton?.click();
+                    }, 500);
+                  }}
+                >
+                  Active Projects
+                </a>
+                <a 
+                  href="#projects" 
+                  className="block px-4 py-3 text-sm hover:bg-gray-50 text-foreground border-b border-gray-100"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Scroll to projects section and trigger Completed filter
+                    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                    // Trigger filter change after scroll
+                    setTimeout(() => {
+                      const filterButton = document.querySelector('[data-filter="Completed"]') as HTMLButtonElement;
+                      filterButton?.click();
+                    }, 500);
+                  }}
+                >
+                  Completed Projects
+                </a>
+                <a 
+                  href="#projects" 
+                  className="block px-4 py-3 text-sm hover:bg-gray-50 text-foreground"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Scroll to projects section and trigger Upcoming filter
+                    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                    // Trigger filter change after scroll
+                    setTimeout(() => {
+                      const filterButton = document.querySelector('[data-filter="Upcoming"]') as HTMLButtonElement;
+                      filterButton?.click();
+                    }, 500);
+                  }}
+                >
+                  Upcoming Projects
+                </a>
               </div>
             </div>
             <a 
@@ -76,6 +126,10 @@ export default function Navbar() {
               className={`transition-colors hover:text-primary ${
                 isScrolled ? 'text-foreground' : 'text-white'
               }`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               About
             </a>
@@ -84,6 +138,10 @@ export default function Navbar() {
               className={`transition-colors hover:text-primary ${
                 isScrolled ? 'text-foreground' : 'text-white'
               }`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               Contact
             </a>
@@ -122,16 +180,98 @@ export default function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
             <div className="px-6 py-4 space-y-4">
-              <a href="#platform" className="block text-foreground hover:text-primary transition-colors">
+              <a 
+                href="#platform" 
+                className="block text-foreground hover:text-primary transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' });
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 Platform
               </a>
-              <a href="#projects" className="block text-foreground hover:text-primary transition-colors">
-                Projects
-              </a>
-              <a href="#about" className="block text-foreground hover:text-primary transition-colors">
+              <div>
+                <button 
+                  onClick={() => setIsMobileProjectsOpen(!isMobileProjectsOpen)}
+                  className="flex items-center justify-between w-full text-foreground hover:text-primary transition-colors"
+                >
+                  <span>Projects</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isMobileProjectsOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isMobileProjectsOpen && (
+                  <div className="mt-2 ml-4 space-y-2">
+                    <a 
+                      href="#projects" 
+                      className="block text-sm text-muted-foreground hover:text-primary transition-colors py-1"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                        setTimeout(() => {
+                          const filterButton = document.querySelector('[data-filter="Active"]') as HTMLButtonElement;
+                          filterButton?.click();
+                        }, 500);
+                        setIsMobileMenuOpen(false);
+                        setIsMobileProjectsOpen(false);
+                      }}
+                    >
+                      Active Projects
+                    </a>
+                    <a 
+                      href="#projects" 
+                      className="block text-sm text-muted-foreground hover:text-primary transition-colors py-1"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                        setTimeout(() => {
+                          const filterButton = document.querySelector('[data-filter="Completed"]') as HTMLButtonElement;
+                          filterButton?.click();
+                        }, 500);
+                        setIsMobileMenuOpen(false);
+                        setIsMobileProjectsOpen(false);
+                      }}
+                    >
+                      Completed Projects
+                    </a>
+                    <a 
+                      href="#projects" 
+                      className="block text-sm text-muted-foreground hover:text-primary transition-colors py-1"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                        setTimeout(() => {
+                          const filterButton = document.querySelector('[data-filter="Upcoming"]') as HTMLButtonElement;
+                          filterButton?.click();
+                        }, 500);
+                        setIsMobileMenuOpen(false);
+                        setIsMobileProjectsOpen(false);
+                      }}
+                    >
+                      Upcoming Projects
+                    </a>
+                  </div>
+                )}
+              </div>
+              <a 
+                href="#about" 
+                className="block text-foreground hover:text-primary transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 About
               </a>
-              <a href="#contact" className="block text-foreground hover:text-primary transition-colors">
+              <a 
+                href="#contact" 
+                className="block text-foreground hover:text-primary transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 Contact
               </a>
               <div className="pt-4 border-t border-gray-200 space-y-3">
